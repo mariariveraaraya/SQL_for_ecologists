@@ -1,0 +1,90 @@
+-- SQL for ecologists
+
+-- GENERAL COMMANDS
+
+SELECT year, month, day
+FROM surveys;
+
+SELECT *
+FROM surveys
+LIMIT 10; 
+
+SELECT plot_id, species_id, sex, weight, ROUND(weight / 1000, 2)
+FROM surveys;
+
+SELECT *
+FROM surveys
+WHERE (species_id = 'DM') OR (species_id = 'DO') OR (species_id = 'DS');
+
+-- Get post 2000 data on Dipodomys' species
+-- These are in the surveys table, and we are interested in all columns
+SELECT * FROM surveys
+-- Sampling year is in the column `year`, and we want to include 2000
+WHERE (year >= 2000)
+-- Dipodomys' species have the `species_id` DM, DO, and DS
+AND (species_id IN ('DM', 'DO', 'DS'));
+
+-- How to ORDER
+SELECT *
+FROM species
+ORDER BY genus ASC, species ASC;
+
+-- JOIN
+
+SELECT *
+FROM surveys
+JOIN species
+ON surveys.species_id = species.species_id;
+
+-- ONLY SOME COLUMNS
+SELECT surveys.year, surveys.month, surveys.day, species.genus, species.species
+FROM surveys
+JOIN species
+
+-- COUNTING
+SELECT COUNT(*)
+FROM surveys
+JOIN species;
+
+-- AGGREGATING
+SELECT plots.plot_type, AVG(surveys.weight)
+FROM surveys
+JOIN plots
+ON surveys.plot_id = plots.plot_id
+GROUP BY plots.plot_type;
+
+SELECT surveys.species_id, AVG(surveys.weight)
+FROM surveys
+JOIN species
+ON surveys.species_id = species.species_id
+WHERE species.taxa = 'Rodent'
+GROUP BY surveys.species_id;
+GROUP BY plots.plot_type;
+USING (species_id);
+ON surveys.species_id = species.species_id;
+
+-- Number of plots
+
+SELECT plot_id, COUNT(*)
+FROM plots
+GROUP BY plot_type
+
+-- SEX PER year
+select sex, year, COUNT(*)
+FROM surveys
+GROUP BY year, sex;
+
+-- Species per plot_id
+
+ SELECT species_id, plot_type, COUNT(*) 
+ FROM surveys 
+ JOIN plots USING(plot_id) 
+ WHERE species_id IS NOT NULL 
+ GROUP BY species_id, plot_type;
+ 
+ --average weight per taxa
+ 
+ SELECT taxa, AVG(weight) 
+ FROM surveys 
+ JOIN species ON species.species_id = surveys.species_id
+ GROUP BY taxa;
